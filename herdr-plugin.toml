@@ -1,0 +1,19 @@
+id = "dev.ariel.herdr-sessions"
+name = "Session Helpers"
+version = "0.1.0"
+min_herdr_version = "0.9.3"
+description = "Agent names, pane labels and session commands."
+platforms = ["macos", "linux"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["zsh","./name-hook.sh"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["zsh","./title-hook.sh"]
+
+[[actions]]
+id = "names"
+title = "Sync agent names from sessions"
+command = ["sh","./bin/herdr-agent-name","--all"]
