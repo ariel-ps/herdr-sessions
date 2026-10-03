@@ -1,0 +1,6 @@
+#!/bin/sh
+bin=$(command -v agent || command -v cursor-agent) || {
+  echo 'cursor-danger: cursor agent CLI not found on PATH; install Cursor CLI first.' >&2
+  exit 127
+}
+exec "$bin" --force --trust "$@"

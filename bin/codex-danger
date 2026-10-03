@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v codex >/dev/null 2>&1 || {
+  echo 'codex-danger: codex CLI not found on PATH; install Codex first.' >&2
+  exit 127
+}
+exec codex --dangerously-bypass-approvals-and-sandbox "$@"

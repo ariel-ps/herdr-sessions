@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v deepcode >/dev/null 2>&1 || {
+  echo 'deepcode-danger: deepcode CLI not found on PATH; install DeepCode first.' >&2
+  exit 127
+}
+exec deepcode --access full-access --trust "$@"
