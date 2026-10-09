@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v agy >/dev/null 2>&1 || {
+  echo 'agy-danger: agy CLI not found on PATH; install Agy first.' >&2
+  exit 127
+}
+exec agy --dangerously-skip-permissions "$@"

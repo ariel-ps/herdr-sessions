@@ -9,6 +9,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMANDS = {
+    'agy-danger': ('agy', ['--dangerously-skip-permissions']),
     'claude-danger': ('claude', ['--dangerously-skip-permissions']),
     'codex-danger': ('codex', ['--dangerously-bypass-approvals-and-sandbox']),
     'cursor-danger': ('agent', ['--force', '--trust']),

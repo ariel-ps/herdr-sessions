@@ -19,6 +19,7 @@ forward all arguments and launch the agent with permission prompts bypassed:
 
 | Command | Agent CLI | Flags added |
 | --- | --- | --- |
+| `agy-danger` | `agy` | `--dangerously-skip-permissions` |
 | `claude-danger` | `claude` | `--dangerously-skip-permissions` |
 | `codex-danger` | `codex` | `--dangerously-bypass-approvals-and-sandbox` |
 | `cursor-danger` | `agent`, falling back to `cursor-agent` | `--force --trust` |
