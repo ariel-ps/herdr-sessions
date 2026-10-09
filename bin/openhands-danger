@@ -1,0 +1,10 @@
+#!/bin/sh
+command -v openhands >/dev/null 2>&1 || {
+  echo 'openhands-danger: openhands CLI not found on PATH; install OpenHands first.' >&2
+  exit 127
+}
+if [ "${1:-}" = acp ]; then
+  shift
+  exec openhands acp --always-approve "$@"
+fi
+exec openhands --always-approve "$@"

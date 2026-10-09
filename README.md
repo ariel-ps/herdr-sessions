@@ -21,9 +21,24 @@ forward all arguments and launch the agent with permission prompts bypassed:
 | --- | --- | --- |
 | `agy-danger` | `agy` | `--dangerously-skip-permissions` |
 | `claude-danger` | `claude` | `--dangerously-skip-permissions` |
+| `cline-danger` | `cline` | `--auto-approve true` |
 | `codex-danger` | `codex` | `--dangerously-bypass-approvals-and-sandbox` |
+| `continue-danger` | `cn` | `--auto` |
+| `copilot-danger` | `copilot` | `--allow-all` |
+| `crush-danger` | `crush` | `--yolo` |
 | `cursor-danger` | `agent`, falling back to `cursor-agent` | `--force --trust` |
 | `deepcode-danger` | `deepcode` | `--access full-access --trust` |
+| `droid-danger` | `droid exec` | `--skip-permissions-unsafe` |
+| `gemini-danger` | `gemini` | `--skip-trust --approval-mode=yolo` |
+| `kimi-danger` | `kimi` | `--yolo` |
+| `kiro-danger` | `kiro-cli` | `--trust-all-tools` |
+| `opencode-danger` | `opencode` | `--auto` |
+| `openhands-danger` | `openhands` | `--always-approve` |
+| `qwen-danger` | `qwen` | `--approval-mode=yolo` |
+
+`droid-danger` is headless and requires a prompt argument or input accepted by
+`droid exec`. Tool policies and administrator-enforced blocks still take
+precedence over bypass flags where the agent supports them.
 
 The scripts work in Bash and Zsh, inside or outside Herdr, on macOS and Linux
 (including Fedora). They use your current directory and existing agent settings.

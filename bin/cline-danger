@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v cline >/dev/null 2>&1 || {
+  echo 'cline-danger: cline CLI not found on PATH; install Cline CLI first.' >&2
+  exit 127
+}
+exec cline --auto-approve true "$@"

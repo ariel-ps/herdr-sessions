@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v kimi >/dev/null 2>&1 || {
+  echo 'kimi-danger: kimi CLI not found on PATH; install Kimi Code CLI first.' >&2
+  exit 127
+}
+exec kimi --yolo "$@"

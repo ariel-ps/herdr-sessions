@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v droid >/dev/null 2>&1 || {
+  echo 'droid-danger: droid CLI not found on PATH; install Factory Droid first.' >&2
+  exit 127
+}
+exec droid exec --skip-permissions-unsafe "$@"

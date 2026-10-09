@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v kiro-cli >/dev/null 2>&1 || {
+  echo 'kiro-danger: kiro-cli not found on PATH; install Kiro CLI first.' >&2
+  exit 127
+}
+exec kiro-cli --trust-all-tools "$@"

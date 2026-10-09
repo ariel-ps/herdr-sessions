@@ -1,0 +1,10 @@
+#!/bin/sh
+command -v opencode >/dev/null 2>&1 || {
+  echo 'opencode-danger: opencode CLI not found on PATH; install OpenCode first.' >&2
+  exit 127
+}
+if [ "${1:-}" = run ]; then
+  shift
+  exec opencode run --auto "$@"
+fi
+exec opencode --auto "$@"

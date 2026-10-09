@@ -11,9 +11,24 @@ ROOT = Path(__file__).resolve().parents[1]
 COMMANDS = {
     'agy-danger': ('agy', ['--dangerously-skip-permissions']),
     'claude-danger': ('claude', ['--dangerously-skip-permissions']),
+    'cline-danger': ('cline', ['--auto-approve', 'true']),
     'codex-danger': ('codex', ['--dangerously-bypass-approvals-and-sandbox']),
+    'continue-danger': ('cn', ['--auto']),
+    'copilot-danger': ('copilot', ['--allow-all']),
+    'crush-danger': ('crush', ['--yolo']),
     'cursor-danger': ('agent', ['--force', '--trust']),
     'deepcode-danger': ('deepcode', ['--access', 'full-access', '--trust']),
+    'droid-danger': ('droid', ['exec', '--skip-permissions-unsafe']),
+    'gemini-danger': ('gemini', ['--skip-trust', '--approval-mode=yolo']),
+    'kimi-danger': ('kimi', ['--yolo']),
+    'kiro-danger': ('kiro-cli', ['--trust-all-tools']),
+    'opencode-danger': ('opencode', ['--auto']),
+    'openhands-danger': ('openhands', ['--always-approve']),
+    'qwen-danger': ('qwen', ['--approval-mode=yolo']),
+}
+SUBCOMMANDS = {
+    'opencode-danger': (['run'], ['run', '--auto']),
+    'openhands-danger': (['acp'], ['acp', '--always-approve']),
 }
 
 
@@ -51,6 +66,18 @@ def check():
                     assert json.loads(stdout) == [
                         [str(stub), *flags, *arguments], str(home), 'input preserved\n', process.pid,
                     ], stdout
+            if name in SUBCOMMANDS:
+                passed, expected = SUBCOMMANDS[name]
+                result = subprocess.run(
+                    [str(plugin / 'bin' / name), *passed, *arguments],
+                    cwd=home, env=env, input='input preserved\n',
+                    capture_output=True, text=True, timeout=10,
+                )
+                assert result.returncode == 23, (name, result.stderr)
+                actual = json.loads(result.stdout)
+                assert actual[:3] == [
+                    [str(stub), *expected, *arguments], str(home), 'input preserved\n',
+                ], actual
             stub.unlink()
             result = subprocess.run([str(plugin / 'bin' / name)], env=env,
                                     capture_output=True, text=True, timeout=10)

@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v gemini >/dev/null 2>&1 || {
+  echo 'gemini-danger: gemini CLI not found on PATH; install Gemini CLI first.' >&2
+  exit 127
+}
+exec gemini --skip-trust --approval-mode=yolo "$@"

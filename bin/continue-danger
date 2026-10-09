@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v cn >/dev/null 2>&1 || {
+  echo 'continue-danger: cn CLI not found on PATH; install Continue CLI first.' >&2
+  exit 127
+}
+exec cn --auto "$@"

@@ -1,0 +1,6 @@
+#!/bin/sh
+command -v qwen >/dev/null 2>&1 || {
+  echo 'qwen-danger: qwen CLI not found on PATH; install Qwen Code first.' >&2
+  exit 127
+}
+exec qwen --approval-mode=yolo "$@"
