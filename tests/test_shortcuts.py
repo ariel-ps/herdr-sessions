@@ -25,6 +25,10 @@ COMMANDS = {
     'opencode-danger': ('opencode', ['--auto']),
     'openhands-danger': ('openhands', ['--always-approve']),
     'qwen-danger': ('qwen', ['--approval-mode=yolo']),
+    'claude-danger-docker': ('docker', ['agent', 'run', 'coder', '--yolo', '--sandbox']),
+    'codex-danger-docker': ('docker', [
+        'agent', 'run', 'coder', '--model', 'openai/gpt-5.3-codex', '--yolo', '--sandbox',
+    ]),
 }
 SUBCOMMANDS = {
     'opencode-danger': (['run'], ['run', '--auto']),
@@ -48,7 +52,8 @@ def check():
             stub = tools / agent
             stub.write_text(f'#!{sys.executable}\n' +
                             'import json, os, sys\n'
-                            'print(json.dumps([sys.argv, os.getcwd(), sys.stdin.read(), os.getpid()]))\n'
+                            'print(json.dumps([sys.argv, os.getcwd(), sys.stdin.read(), os.getpid(), '
+                            'os.environ.get("HERDR_AGENT")]))\n'
                             'sys.exit(23)\n')
             stub.chmod(0o755)
             for executable in ([agent, 'cursor-agent'] if name == 'cursor-danger' else [agent]):
@@ -65,6 +70,8 @@ def check():
                     assert process.returncode == 23, (name, shell, stderr)
                     assert json.loads(stdout) == [
                         [str(stub), *flags, *arguments], str(home), 'input preserved\n', process.pid,
+                        {'claude-danger-docker': 'claude',
+                         'codex-danger-docker': 'codex'}.get(name),
                     ], stdout
             if name in SUBCOMMANDS:
                 passed, expected = SUBCOMMANDS[name]

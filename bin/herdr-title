@@ -51,8 +51,8 @@
 #   herdr-title --all --dry-run    # what it would do to every pane, changing none
 #   herdr-title --all --restore    # take every stamp back off
 #
-# Knobs come from the environment only. title-hook.sh sources config.sh and passes
-# them through, because that file is documented as zsh and this is sh — callers are
+# Knobs come from the environment only. The title event hook sources config.sh
+# and passes them through, because that file is zsh and this is sh — callers are
 # agents shelling out with `sh -c`, the same reason bin/herdr-whoami is sh.
 #   HERDR_TITLE_OFF=1          do nothing at all
 #   HERDR_TITLE_SEP=' · '      stem/derived separator
@@ -61,6 +61,7 @@
 
 set -u
 
+HERDR_BIN=${HERDR_BIN_PATH:-herdr}
 mode=stamp
 scope=one
 dry=0
@@ -105,9 +106,9 @@ done
 
 note() { [ "$quiet" = 1 ] || echo "herdr-title: $1" >&2; }
 
-# :- rather than - throughout: title-hook.sh exports these whether or not
-# config.sh set them, and an exported-but-empty HERDR_TITLE_SEP would collapse
-# the stem/derived split into an unrecoverable single string.
+# :- rather than - throughout: the title event hook exports these whether or
+# not config.sh set them, and an exported-but-empty HERDR_TITLE_SEP would
+# collapse the stem/derived split into an unrecoverable single string.
 sep="${HERDR_TITLE_SEP:- · }"
 maxbranch="${HERDR_TITLE_MAX_BRANCH:-24}"
 want_branch="${HERDR_TITLE_BRANCH:-1}"
@@ -116,7 +117,7 @@ want_branch="${HERDR_TITLE_BRANCH:-1}"
 
 # Absent tooling and a stopped server are both "herdr is not running here", which
 # is a no-op and not a failure — this runs from an event hook and from agents.
-command -v herdr >/dev/null 2>&1 || { note "herdr not on PATH"; exit 0; }
+command -v "$HERDR_BIN" >/dev/null 2>&1 || { note "herdr not on PATH"; exit 0; }
 command -v jq >/dev/null 2>&1 || { note "jq not found"; exit 0; }
 
 if [ "$scope" = one ] && [ -z "$pane" ]; then
@@ -136,7 +137,7 @@ only=$pane
 # has no label. A non-whitespace IFS preserves empty fields, and \x1f cannot
 # occur in a label, a cwd or a pane id, so nothing needs escaping.
 records=$(
-  { herdr pane list 2>/dev/null; herdr agent list 2>/dev/null; } | jq -s -r --arg only "$only" '
+  { "$HERDR_BIN" pane list 2>/dev/null; "$HERDR_BIN" agent list 2>/dev/null; } | jq -s -r --arg only "$only" '
     ((.[1] // {}) | (.result // {}) | (.agents // [])
       | map({key: .pane_id, value: (.name // "")}) | from_entries) as $names
     | ((.[0] // {}) | (.result // {}) | (.panes // []))
@@ -216,9 +217,9 @@ apply() {
     return 0
   fi
   if [ -z "$ap_new" ]; then
-    herdr pane rename "$ap_pane" --clear >/dev/null 2>&1 </dev/null || return 0
+    "$HERDR_BIN" pane rename "$ap_pane" --clear >/dev/null 2>&1 </dev/null || return 0
   else
-    herdr pane rename "$ap_pane" "$ap_new" >/dev/null 2>&1 </dev/null || return 0
+    "$HERDR_BIN" pane rename "$ap_pane" "$ap_new" >/dev/null 2>&1 </dev/null || return 0
   fi
   [ "$quiet" = 1 ] || printf '%s\t%s\n' "$ap_pane" "${ap_new:--}"
 }

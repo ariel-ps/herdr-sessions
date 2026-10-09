@@ -85,7 +85,8 @@ done
 say()  { [ "$quiet" = 1 ] || printf '%s\n' "$*"; }
 die()  { [ "$quiet" = 1 ] || printf 'herdr-agent-name: %s\n' "$*" >&2; exit 1; }
 
-command -v herdr >/dev/null 2>&1 || die "herdr not on PATH"
+HERDR_BIN=${HERDR_BIN_PATH:-herdr}
+command -v "$HERDR_BIN" >/dev/null 2>&1 || die "herdr not on PATH"
 command -v jq    >/dev/null 2>&1 || die "jq not found"
 [ "$all" = 1 ] || [ -n "$pane" ] || die "HERDR_PANE_ID is unset; pass --pane <id> or --all"
 
@@ -94,7 +95,7 @@ if [ "$clear" = 1 ]; then
   [ "$all" = 1 ] && die "--clear takes one pane, not --all"
   if [ "$dry" = 1 ]; then
     say "$pane	would clear"
-  elif herdr agent rename "$pane" --clear >/dev/null 2>&1; then
+  elif "$HERDR_BIN" agent rename "$pane" --clear >/dev/null 2>&1; then
     say "$pane	cleared"
   else
     die "could not clear $pane"
@@ -108,7 +109,7 @@ fi
 # are dropped here rather than filtered later — a plain shell pane is not an
 # error, it is simply not a candidate.
 roster=$(
-  { herdr pane list 2>/dev/null; herdr agent list 2>/dev/null; } | jq -s -r '
+  { "$HERDR_BIN" pane list 2>/dev/null; "$HERDR_BIN" agent list 2>/dev/null; } | jq -s -r '
     (.[0].result.panes // [])                                            as $panes
     | ((.[1].result.agents // []) | map({key: .pane_id, value: .name}) | from_entries) as $named
     | $panes[]
@@ -214,7 +215,7 @@ while IFS='	' read -r pane_id agent session_id current; do
   # rest of the grid from getting named.
   # </dev/null because this loop's stdin is the roster heredoc, and a child that
   # reads stdin would eat the panes we have not visited yet.
-  if herdr agent rename "$pane_id" "$slug" >/dev/null 2>&1 </dev/null; then
+  if "$HERDR_BIN" agent rename "$pane_id" "$slug" >/dev/null 2>&1 </dev/null; then
     say "$pane_id	renamed	$slug"
   else
     [ "$quiet" = 1 ] || printf 'herdr-agent-name: %s: herdr refused the name %s\n' "$pane_id" "$slug" >&2
