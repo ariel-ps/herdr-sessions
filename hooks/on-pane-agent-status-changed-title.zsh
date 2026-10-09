@@ -22,9 +22,9 @@
 
 emulate -L zsh
 
-# HERDR_PLUGIN_ROOT is set by herdr; the ${0:A:h} fallback keeps the hook
-# runnable by hand, which is how it gets tested.
-root="${HERDR_PLUGIN_ROOT:-${0:A:h}}"
+# HERDR_PLUGIN_ROOT is set by herdr; resolving one directory above this file
+# keeps the relocated hook runnable by hand and from checkouts containing spaces.
+root="${HERDR_PLUGIN_ROOT:-${0:A:h:h}}"
 command -v jq >/dev/null 2>&1 || exit 0
 
 # Same config.sh the alert hook reads, and read here rather than in herdr-title

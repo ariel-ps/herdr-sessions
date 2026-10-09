@@ -1,0 +1,7 @@
+#!/bin/sh
+command -v docker >/dev/null 2>&1 || {
+  echo 'claude-danger-docker: docker CLI not found on PATH; install Docker Desktop first.' >&2
+  exit 127
+}
+export HERDR_AGENT=claude
+exec docker agent run coder --yolo --sandbox "$@"

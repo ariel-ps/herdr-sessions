@@ -62,20 +62,21 @@ done
 
 die() { [ "$mode" = quiet ] || echo "herdr-whoami: $1" >&2; exit 1; }
 
+HERDR_BIN=${HERDR_BIN_PATH:-herdr}
 [ "${HERDR_ENV:-}" = 1 ] || [ -n "$pane" ] || die "not running inside herdr (HERDR_ENV unset)"
 [ -n "$pane" ] || die "HERDR_PANE_ID is unset; pass --pane <id>"
-command -v herdr >/dev/null 2>&1 || die "herdr not on PATH"
+command -v "$HERDR_BIN" >/dev/null 2>&1 || die "herdr not on PATH"
 command -v jq >/dev/null 2>&1 || die "jq not found"
 
 # Two calls because the identifiers live in two places: `pane current`/`pane
 # list` never carries the agent name, and `agent list` never carries the pane
 # label. The agent call is allowed to fail — a pane with no agent in it is a
 # normal shell, not an error.
-pane_json=$(herdr pane list 2>/dev/null | jq -c --arg p "$pane" \
+pane_json=$("$HERDR_BIN" pane list 2>/dev/null | jq -c --arg p "$pane" \
   '.result.panes[]? | select(.pane_id == $p)') || pane_json=
 [ -n "$pane_json" ] || die "no pane $pane (is the server running?)"
 
-agent_json=$(herdr agent list 2>/dev/null | jq -c --arg p "$pane" \
+agent_json=$("$HERDR_BIN" agent list 2>/dev/null | jq -c --arg p "$pane" \
   '.result.agents[]? | select(.pane_id == $p)') || agent_json=
 [ -n "$agent_json" ] || agent_json='{}'
 

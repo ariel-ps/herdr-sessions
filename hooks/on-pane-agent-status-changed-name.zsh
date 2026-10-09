@@ -4,10 +4,10 @@
 # address other than w1:p6.
 #
 # The work is in bin/herdr-agent-name — this is only the adapter, for the same
-# reason title-hook.sh is: the useful entry point has to be runnable by hand and
-# by an agent shelling out, and an event hook is neither. Why the agent name and
-# not the label, why only user-set names, and why this is not three entries in
-# ~/.claude/settings.json are all in that file's header.
+# reason the title hook is: the useful entry point has to be runnable by hand
+# and by an agent shelling out, and an event hook is neither. Why the agent name
+# and not the label, why only user-set names, and why this is not three entries
+# in ~/.claude/settings.json are all in that file's header.
 #
 # pane.agent_status_changed is the trigger, which is indirect on purpose. The
 # event that actually matters is `/rename`, and no such event exists — Claude
@@ -18,7 +18,7 @@
 # name until it is next used; run `herdr-agent-name` by hand if that matters.
 #
 # The pane comes from the event and is passed through as --pane, so this stays
-# one pane's worth of work per status change — the same cost as title-hook —
+# one pane's worth of work per status change — the same cost as the title hook —
 # rather than re-syncing the whole grid every time any agent blinks.
 #
 # Env in: HERDR_PLUGIN_EVENT_JSON (pane_id, agent_status, agent, display_agent).
@@ -26,9 +26,9 @@
 
 emulate -L zsh
 
-# HERDR_PLUGIN_ROOT is set by herdr; the ${0:A:h} fallback keeps the hook
-# runnable by hand, which is how it gets tested.
-root="${HERDR_PLUGIN_ROOT:-${0:A:h}}"
+# HERDR_PLUGIN_ROOT is set by herdr; resolving one directory above this file
+# keeps the relocated hook runnable by hand and from checkouts containing spaces.
+root="${HERDR_PLUGIN_ROOT:-${0:A:h:h}}"
 command -v jq >/dev/null 2>&1 || exit 0
 
 # Same config.sh the alert and title hooks read, and read here rather than in

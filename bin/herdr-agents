@@ -61,6 +61,7 @@
 
 set -u
 
+HERDR_BIN=${HERDR_BIN_PATH:-herdr}
 TAB=$(printf '\t')
 LINES_DEFAULT=80
 TIMEOUT_DEFAULT=120000
@@ -118,12 +119,12 @@ need() { command -v "$1" >/dev/null 2>&1 || die "$1 not found"; }
 # carries the agent name and `agent list` never carries the pane label. Same
 # split herdr-whoami works around, for the same reason.
 roster() {
-  _panes=$(herdr pane list 2>/dev/null) || _panes=''
+  _panes=$("$HERDR_BIN" pane list 2>/dev/null) || _panes=''
   case $_panes in
     *'"panes"'*) ;;
     *) die "cannot reach the herdr server — check \`herdr status server\`" ;;
   esac
-  _agents=$(herdr agent list 2>/dev/null) || _agents='{}'
+  _agents=$("$HERDR_BIN" agent list 2>/dev/null) || _agents='{}'
   printf '%s\n%s\n' "$_panes" "$_agents" | jq -c -s '
     def clean: if . == null or . == "" then null else . end;
     ([ (.[1].result.agents // [])[] | {key: .pane_id, value: .} ] | from_entries) as $named
@@ -249,7 +250,7 @@ CHROME='[[:space:]─│┌┐└┘├┤┬┴┼━┃┏┓┗┛╭╮╰�
 cmd_read() {
   _row=$1
   _pane=$(field "$_row" pane)
-  _out=$(herdr agent read "$_pane" --source "$SOURCE" --lines "$READ_LINES" --format text 2>&1) || {
+  _out=$("$HERDR_BIN" agent read "$_pane" --source "$SOURCE" --lines "$READ_LINES" --format text 2>&1) || {
     printf 'herdr-agents: could not read %s: %s\n' "$(field "$_row" name)" \
       "$(printf '%s' "$_out" | jq -r '.error.message // .error.code // .' 2>/dev/null || printf '%s' "$_out")" >&2
     return 1
@@ -307,9 +308,9 @@ send_one() {
   [ -n "$WAIT" ] && set -- "$@" --wait --timeout "$TIMEOUT"
   # stdin closed so a herdr call inside a `while read` loop cannot eat the
   # list of recipients it is being fed from.
-  if _out=$(herdr "$@" </dev/null 2>&1); then
+  if _out=$("$HERDR_BIN" "$@" </dev/null 2>&1); then
     if [ -n "$WAIT" ]; then
-      _now=$(herdr agent get "$_pane" </dev/null 2>/dev/null | jq -r '.result.agent.agent_status // "?"')
+      _now=$("$HERDR_BIN" agent get "$_pane" </dev/null 2>/dev/null | jq -r '.result.agent.agent_status // "?"')
       printf 'sent -> %s (%s), now %s\n' "$_name" "$_pane" "$_now"
     else
       printf 'sent -> %s (%s)\n' "$_name" "$_pane"
@@ -432,14 +433,14 @@ EOF
 
 # ---------------------------------------------------------------- arguments
 
-CMD=ls
+CMD='ls'
 if [ $# -gt 0 ]; then
   case $1 in
-    ls|list)        CMD=ls; shift ;;
-    send|tell)      CMD=send; shift ;;
-    read)           CMD=read; shift ;;
-    broadcast|all)  CMD=broadcast; shift ;;
-    roles|brief)    CMD=roles; shift ;;
+    ls|list)        CMD='ls'; shift ;;
+    send|tell)      CMD='send'; shift ;;
+    read)           CMD='read'; shift ;;
+    broadcast|all)  CMD='broadcast'; shift ;;
+    roles|brief)    CMD='roles'; shift ;;
     -h|--help)      usage; exit 0 ;;
     -*)             : ;;   # bare flags with no verb list the fleet
     *)              die "unknown command '$1' — try: ls send read broadcast roles" 2 ;;
@@ -500,7 +501,7 @@ done
 case $TIMEOUT in *[!0-9]*|'') die "--timeout wants milliseconds, got '$TIMEOUT'" 2 ;; esac
 case $READ_LINES in *[!0-9]*|'') die "--lines wants a number, got '$READ_LINES'" 2 ;; esac
 
-need herdr
+need "$HERDR_BIN"
 need jq
 
 ROSTER=$(roster)

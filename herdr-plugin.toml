@@ -7,13 +7,13 @@ platforms = ["macos", "linux"]
 
 [[events]]
 on = "pane.agent_status_changed"
-command = ["zsh","./name-hook.sh"]
+command = ["zsh", "./hooks/on-pane-agent-status-changed-name.zsh"]
 
 [[events]]
 on = "pane.agent_status_changed"
-command = ["zsh","./title-hook.sh"]
+command = ["zsh", "./hooks/on-pane-agent-status-changed-title.zsh"]
 
 [[actions]]
 id = "names"
 title = "Sync agent names from sessions"
-command = ["sh","./bin/herdr-agent-name","--all"]
+command = ["sh", "./bin/herdr-agent-name", "--all"]
